@@ -105,4 +105,18 @@ footer {
     flex-direction: column;
     align-items: center;
   }
+  .descripcion-imagenes {
+  display: flex;
+  gap: 10px;           /* espacio entre imágenes */
+  margin-top: 15px;
 }
+
+.descripcion-imagenes img {
+  flex: 1;             /* cada imagen ocupa el mismo ancho */
+  max-width: 100%;
+  height: 180px;       /* altura fija para que queden iguales */
+  object-fit: cover;   /* recorta un poco pero mantiene proporciones */
+  border-radius: 8px;
+}
+}
+
