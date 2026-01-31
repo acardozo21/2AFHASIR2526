@@ -136,13 +136,38 @@
         </section>
 
         <section id="pasos" class="card">
-            <h2>Checklist de Generación (macOS)</h2>
-            <h3>1. Entorno</h3>
-            <pre><code>python3 -m venv venv && source venv/bin/activate
-pip install -r llama.cpp/requirements.txt</code></pre>
-            <h3>2. Conversión</h3>
-            <pre><code>python3 llama.cpp/convert_hf_to_gguf.py ./Phi-3-mini \
---outtype q4_k_m --outfile phi-3-mini-q4.gguf</code></pre>
+                <h2>Checklist de Generación (macOS)</h2>
+                <p>Este es el flujo completo que seguí para cuantizar <code>Phi-3-mini-4k-instruct</code> y usarlo en LM Studio.</p>
+            
+                <h3>1. Preparar el entorno</h3>
+                <pre><code>mkdir ~/cuantizacion-phi3 && cd ~/cuantizacion-phi3
+            brew install git-lfs && git lfs install
+            git clone https://github.com/ggerganov/llama.cpp.git
+            python3 -m venv venv && source venv/bin/activate
+            pip install -r llama.cpp/requirements.txt torch transformers huggingface-hub</code></pre>
+                <p>Con esto dejas listo <strong>llama.cpp</strong>, el entorno virtual de Python y todas las dependencias necesarias para convertir el modelo.</p>
+            
+                <h3>2. Descargar el modelo original</h3>
+                <pre><code>git clone https://huggingface.co/microsoft/Phi-3-mini-4k-instruct</code></pre>
+                <p>Este repositorio contiene el modelo en formato de Hugging Face (<code>pytorch_model.bin</code> y archivos de configuración).</p>
+            
+                <h3>3. Cuantizar a GGUF (Q4_K_M)</h3>
+                <pre><code>python3 llama.cpp/convert_hf_to_gguf.py ./Phi-3-mini-4k-instruct \
+             --outtype q4_k_m \
+             --outfile phi-3-mini-q4_k_m.gguf</code></pre>
+                <p>Aquí se convierte el modelo de precisión completa a un modelo <strong>cuantizado</strong> en formato <code>.gguf</code>, reduciendo tamaño y mejorando la velocidad.</p>
+            
+                <h3>4. Instalar el modelo en LM Studio</h3>
+                <pre><code>mkdir -p ~/Library/Application\ Support/LMStudio/models/Microsoft/Phi-3-mini-4k-instruct
+            cp phi-3-mini-q4_k_m.gguf ~/Library/Application\ Support/LMStudio/models/Microsoft/Phi-3-mini-4k-instruct/</code></pre>
+                <p>Copias el archivo cuantizado a la carpeta de modelos de LM Studio para que aparezca en la lista de modelos locales.</p>
+            
+                <h3>5. Probar el modelo cuantizado en LM Studio</h3>
+                <pre><code># En LM Studio:
+            # 1. AI Chat → Microsoft/Phi-3-mini-4k-instruct → Load
+            # 2. Prompt de prueba:
+            Explica qué es la cuantización</code></pre>
+                <p>En esta prueba comprobaste que el modelo pasa de ~7,1&nbsp;GB a ~2,3&nbsp;GB y genera más rápido manteniendo buena calidad de respuesta.</p>
         </section>
 
         <section id="diferencias" class="card">
