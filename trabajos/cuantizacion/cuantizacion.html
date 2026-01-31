@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuantización de Modelos LLM - Proyecto Phi-3</title>
- 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -15,7 +14,6 @@
             --code-bg: #21262d;
             --border-color: #30363d;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
@@ -24,8 +22,6 @@
             margin: 0;
             padding: 0;
         }
-
-    
         nav {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
@@ -34,7 +30,6 @@
             z-index: 100;
             padding: 1rem 2rem;
         }
-        
         nav ul {
             list-style: none;
             padding: 0;
@@ -43,32 +38,23 @@
             gap: 20px;
             justify-content: center;
         }
-
         nav a {
             color: var(--accent-color);
             text-decoration: none;
             font-weight: bold;
             font-size: 1.1rem;
         }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-  
+        nav a:hover { text-decoration: underline; }
         .container {
             max-width: 900px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
-
         h1, h2, h3 {
             color: #ffffff;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.5rem;
         }
-
-      
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -76,8 +62,6 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
-
-    
         pre {
             background-color: var(--code-bg);
             padding: 1rem;
@@ -85,196 +69,131 @@
             overflow-x: auto;
             border: 1px solid var(--border-color);
         }
-        
         code {
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
             color: #79c0ff;
             font-size: 0.9em;
         }
-
-      
-        .img-placeholder {
+        
+     
+        .img-container {
             width: 100%;
-            height: auto;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 1rem 0;
-            overflow: hidden;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        img { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         }
         
-        img {
-            max-width: 100%;
-            display: block;
-        }
-
-   
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
         }
-        
         th, td {
             border: 1px solid var(--border-color);
             padding: 0.8rem;
             text-align: left;
         }
+        th { background-color: var(--code-bg); color: white; }
         
-        th {
-            background-color: var(--code-bg);
-            color: white;
-        }
-
-       
         .chart-container {
             position: relative;
-            height: 300px;
+            height: 400px;
             width: 100%;
+            margin-top: 20px;
         }
-
-        .highlight {
-            color: var(--accent-color);
-            font-weight: bold;
+        .highlight { color: var(--accent-color); font-weight: bold; }
+        .caption {
+            display: block;
+            text-align: center;
+            font-size: 0.9em;
+            color: #8b949e;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
 <body>
-
-
     <nav>
         <ul>
             <li><a href="#intro">¿Qué es?</a></li>
             <li><a href="#pasos">Paso a Paso</a></li>
-            <li><a href="#diferencias">Diferencias y Resultados</a></li>
+            <li><a href="#diferencias">Diferencias</a></li>
         </ul>
     </nav>
-
     <div class="container">
-        
         <header style="text-align: center; margin-bottom: 3rem;">
             <h1>Proyecto de Cuantización: Phi-3</h1>
             <p>Optimización de LLMs para ejecución local eficiente</p>
         </header>
 
-       
         <section id="intro" class="card">
             <h2>¿Qué es la Cuantización?</h2>
-            <p>
-                Según nuestras pruebas realizadas con el modelo Phi-3, la cuantificación es un proceso que 
-                <strong>reduce el número de bits utilizados para representar los pesos y activaciones</strong> del modelo.
-            </p>
-            <p>
-                El objetivo principal es mejorar el rendimiento al ejecutarse sobre plataformas con recursos limitados 
-                (como un ordenador local o portátil), disminuyendo su huella de memoria sin un impacto notable en 
-                la precisión o "inteligencia" del modelo.
-            </p>
+            <p>La cuantificación reduce el número de bits para representar los pesos del modelo. Permite ejecutar LLMs en hardware limitado reduciendo la memoria RAM necesaria sin perder mucha precisión.</p>
         </section>
 
-  
         <section id="pasos" class="card">
-            <h2>Generación del Modelo (Checklist macOS)</h2>
-            <p>A continuación se detalla el proceso técnico seguido para cuantizar el modelo de formato de>F16</code> a de>GGUF (Q4_K_M)</code>.</p>
-
-            <h3>1. Preparación del Entorno</h3>
-            <pre>de>mkdir ~/cuantizacion-phi3 && cd ~/cuantizacion-phi3
-brew install git-lfs && git lfs install
-git clone https://github.com/ggerganov/llama.cpp.git
-python3 -m venv venv && source venv/bin/activate
-pip install -r llama.cpp/requirements.txt torch transformers huggingface-hub</code></pre>
-
-            <h3>2. Descarga del Modelo Original</h3>
-            <pre>de>git clone https://huggingface.co/microsoft/Phi-3-mini-4k-instruct</code></pre>
-
-            <h3>3. Cuantización (El paso clave)</h3>
-            <p>Convertimos el modelo de HuggingFace a formato GGUF con cuantización Q4_K_M:</p>
-            <pre>de>python3 llama.cpp/convert_hf_to_gguf.py ./Phi-3-mini-4k-instruct \
---outtype q4_k_m \
---outfile phi-3-mini-q4_k_m.gguf</code></pre>
-
-            <h3>4. Instalación en LM Studio</h3>
-            <pre>de>mkdir -p ~/Library/Application\ Support/LMStudio/models/Microsoft/Phi-3-mini-4k-instruct
-cp phi-3-mini-q4_k_m.gguf ~/Library/Application\ Support/LMStudio/models/Microsoft/Phi-3-mini-4k-instruct/</code></pre>
+            <h2>Checklist de Generación (macOS)</h2>
+            <h3>1. Entorno</h3>
+            <pre><code>python3 -m venv venv && source venv/bin/activate
+pip install -r llama.cpp/requirements.txt</code></pre>
+            <h3>2. Conversión</h3>
+            <pre><code>python3 llama.cpp/convert_hf_to_gguf.py ./Phi-3-mini \
+--outtype q4_k_m --outfile phi-3-mini-q4.gguf</code></pre>
         </section>
 
-    
         <section id="diferencias" class="card">
-            <h2>Comparativa: Cuantizado vs No Cuantizado</h2>
+            <h2>Comparativa</h2>
             
-            <div class="img-placeholder">
-            
-                <img src="1.jpg" alt="1">
+     
+            <div class="img-container">
+                <img src="1.png" alt="1">
+                <span class="caption">Fig 1. Comparación de consumo de memoria en LM Studio</span>
             </div>
-            <p style="text-align: center; font-size: 0.9em; color: #8b949e;">Fig 1. Comparación de consumo de memoria en LM Studio.</p>
-
-            <h3>Análisis de Rendimiento</h3>
-            <p>Al ejecutar el prompt <em>"Explica qué es la cuantización"</em>, obtuvimos los siguientes resultados:</p>
 
             <table>
                 <thead>
-                    <tr>
-                        <th>Métrica</th>
-                        <th>Modelo Original (F16)</th>
-                        <th>Modelo Cuantizado (Q4)</th>
-                        <th>Mejora</th>
-                    </tr>
+                    <tr><th>Métrica</th><th>Original (F16)</th><th>Cuantizado (Q4)</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>Tamaño en Disco/RAM</strong></td>
-                        <td>7.12 GB</td>
-                        <td>2.23 GB</td>
-                        <td class="highlight">~68% más ligero</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Velocidad (Tokens/seg)</strong></td>
-                        <td>12.74 tok/sec</td>
-                        <td>30.36 tok/sec</td>
-                        <td class="highlight">~2.3x más rápido</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Tiempo primer token</strong></td>
-                        <td>4.72 s</td>
-                        <td>5.18 s</td>
-                        <td>Similar</td>
-                    </tr>
+                    <tr><td>Tamaño</td><td>7.12 GB</td><td class="highlight">2.23 GB</td></tr>
+                    <tr><td>Velocidad</td><td>12.74 t/s</td><td class="highlight">30.36 t/s</td></tr>
                 </tbody>
             </table>
 
-            <h3>Gráfico Comparativo</h3>
+            <h3>Gráfico de Rendimiento</h3>
             <div class="chart-container">
-                <Canvas id="myChart"></canvas>
+                <canvas id="myChart"></canvas>
             </div>
 
-            <div class="img-placeholder" style="margin-top: 2rem;">
-       
-                <img src="2.jpg" alt="Captura de la respuesta del chat y métricas de velocidad">
+          
+            <div class="img-container" style="margin-top: 3rem;">
+                <img src="2.png" alt="2">
+                <span class="caption">Fig 2. Calidad de respuesta y métricas de generación</span>
             </div>
-            <p style="text-align: center; font-size: 0.9em; color: #8b949e;">Fig 2. Calidad de respuesta y métricas de generación en tiempo real.</p>
         </section>
-
     </div>
 
-   
     <script>
         const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Tamaño (GB)', 'Velocidad (Tokens/seg)'],
+                labels: ['Tamaño (GB) - Menos es mejor', 'Velocidad (t/s) - Más es mejor'],
                 datasets: [{
                     label: 'Original (F16)',
                     data: [7.12, 12.74],
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 },
                 {
-                    label: 'Cuantizado (Q4_K_M)',
+                    label: 'Cuantizado (Q4)',
                     data: [2.23, 30.36],
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]
@@ -283,27 +202,22 @@ cp phi-3-mini-q4_k_m.gguf ~/Library/Application\ Support/LMStudio/models/Microso
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#30363d'
-                        },
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#30363d' },
                         ticks: { color: '#c9d1d9' }
                     },
-                    x: {
-                        grid: {
-                            color: '#30363d'
-                        },
+                    x: { 
+                        grid: { color: '#30363d' },
                         ticks: { color: '#c9d1d9' }
                     }
                 },
                 plugins: {
-                    legend: {
-                        labels: { color: '#c9d1d9' }
-                    }
+                    legend: { labels: { color: '#c9d1d9' } }
                 }
             }
         });
     </script>
 </body>
 </html>
+
