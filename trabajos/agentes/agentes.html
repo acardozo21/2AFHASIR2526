@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axel Cardozo - Agente IA </title>
+
+  <style>
+    :root{
+      --primary: #ff6b6b;
+      --secondary: #4ecdc4;
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 12px 35px rgba(0,0,0,0.35);
+      --radius: 18px;
+      --max: 980px;
+    }
+    *{ box-sizing: border-box; }
+    html{ scroll-behavior: smooth; }
+    body{
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #eaf0ff;
+      background:
+        radial-gradient(900px 450px at 10% 0%, rgba(78,205,196,0.22), transparent 60%),
+        radial-gradient(900px 450px at 90% 10%, rgba(255,107,107,0.18), transparent 55%),
+        linear-gradient(180deg, #081022, #060a14 70%, #05070f);
+    }
+
+    /* NAV */
+    .nav{
+      position: sticky; top: 0; z-index: 999;
+      backdrop-filter: blur(12px);
+      background: rgba(6,10,20,0.72);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none; color:#fff; font-weight:800;
+      white-space:nowrap;
+    }
+    .brand-badge{
+      width:38px; height:38px; border-radius:12px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: 0 10px 25px rgba(255,107,107,0.20);
+      font-size:18px;
+    }
+    .menu-btn{
+      display:none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .nav-links{ display:flex; gap:10px; align-items:center; }
+    .nav-links a{
+      color: rgba(234,240,255,0.9);
+      text-decoration:none;
+      font-weight:600;
+      font-size:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid transparent;
+      transition:.18s ease;
+    }
+    .nav-links a:hover{
+      border-color: var(--border);
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-1px);
+    }
+    .cta{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px;
+      border: 1px solid rgba(78,205,196,0.35);
+      background: rgba(78,205,196,0.10);
+      color:#eafffb;
+      padding:10px 14px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      transition:.18s ease;
+      white-space:nowrap;
+    }
+    .cta:hover{ background: rgba(78,205,196,0.16); transform: translateY(-1px); }
+
+    /* Layout */
+    .container{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 26px 18px 80px;
+    }
+    .hero{
+      margin-top:20px;
+      padding: 28px 22px;
+      border-radius: 26px;
+      background:
+        linear-gradient(135deg, rgba(255,107,107,0.22), rgba(78,205,196,0.14)),
+        rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .hero h1{
+      margin:0 0 10px;
+      font-size: clamp(26px, 4vw, 40px);
+      line-height:1.1;
+    }
+    .hero p{ margin:0; color: rgba(234,240,255,0.86); line-height:1.6; }
+
+    .grid{
+      margin-top: 22px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    .card{
+      grid-column: span 12;
+      padding: 20px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+    }
+    .card h2{ margin:0 0 10px; font-size:18px; display:flex; gap:10px; align-items:center; }
+    .card p{ margin:0; color: rgba(234,240,255,0.86); line-height:1.6; }
+    .success{
+      background: linear-gradient(135deg, rgba(78,205,196,0.14), rgba(255,255,255,0.05));
+      border-left: 6px solid var(--secondary);
+    }
+    pre{
+      margin: 14px 0 0;
+      padding: 16px;
+      border-radius: 14px;
+      overflow-x: auto;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      color: #d6e3ff;
+    }
+
+    /* ===== CAPTURAS (MEJORADAS) ===== */
+    .shots{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    /* En desktop, dos columnas */
+    @media (min-width: 900px){
+      .shots{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Cada captura ahora es un link grande */
+    .shotLink{
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+      transform: translateZ(0);
+    }
+
+    .shotMedia{
+      position: relative;
+      overflow: hidden;
+      background: rgba(0,0,0,0.35);
+    }
+
+    .shotMedia img{
+      width: 100%;
+      height: 320px;           /* MÁS GRANDE */
+      object-fit: cover;       /* Se ve bien aunque sea screenshot */
+      display: block;
+      transform: scale(1);
+      transition: transform .25s ease;
+    }
+
+    /* Zoom al pasar el mouse */
+    .shotLink:hover .shotMedia img{
+      transform: scale(1.12);
+    }
+
+    /* Overlay “Abrir” */
+    .shotHint{
+      position:absolute;
+      inset: 12px 12px auto auto;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.20);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      color: rgba(234,240,255,0.95);
+      backdrop-filter: blur(8px);
+    }
+
+    .shotCaption{
+      padding: 12px 14px 14px;
+      color: rgba(234,240,255,0.86);
+      font-size: 13.5px;
+      line-height: 1.5;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+
+    /* Un poquito más alto en pantallas grandes */
+    @media (min-width: 1100px){
+      .shotMedia img{ height: 360px; }
+    }
+
+    /* Mobile menu */
+    @media (max-width: 860px){
+      .menu-btn{ display:inline-flex; }
+      .nav-links{
+        display:none;
+        width:100%;
+        flex-direction:column;
+        align-items:stretch;
+        padding: 8px 0 0;
+      }
+      .nav-links.open{ display:flex; }
+      .cta{ width:100%; }
+    }
+
+    footer{
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,107,107,0.18), rgba(78,205,196,0.10));
+      box-shadow: var(--shadow);
+      text-align: center;
+      color: rgba(234,240,255,0.92);
+    }
+    footer h3{ margin: 0 0 6px; }
+    footer p{ margin: 0; color: rgba(234,240,255,0.85); }
+
+    /* Back to top */
+    .top-btn{
+      position: fixed; right: 16px; bottom: 16px; z-index: 999;
+      text-decoration:none;
+      border-radius: 999px;
+      padding: 12px 14px;
+      font-weight: 900;
+      color: #0b1220;
+      background: linear-gradient(135deg, var(--secondary), #a7fff7);
+      box-shadow: 0 14px 30px rgba(78,205,196,0.20);
+      border: 1px solid rgba(255,255,255,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: .2s ease;
+    }
+    .top-btn.show{ opacity:1; pointer-events:auto; transform: translateY(0); }
+  </style>
+</head>
+
+<body id="top">
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-badge">🤖</span>
+        <span>Axel Cardozo · IA Local</span>
+      </a>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">☰ Menú</button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#equipo">Equipo</a>
+        <a href="#lmstudio">LM Studio</a>
+        <a href="#servidor">Servidor</a>
+        <a href="#opencode">OpenCode</a>
+        <a href="#capturas">Capturas</a>
+        <a href="#prueba">Prueba</a>
+      </div>
+
+      <a class="cta" href="#capturas">📸 Ver capturas</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header class="hero">
+      <h1>Agentes</h1>
+      <p>Mi configuración personalizada paso a paso para ejecutar un modelo local con LM Studio y conectarlo a OpenCode.</p>
+    </header>
+
+    <section class="grid" id="equipo">
+      <div class="card success">
+        <h2>💻 Mi equipo técnico</h2>
+        <p>Intel Core i5 + Iris Plus Graphics + 12GB DDR4<br><strong>GPU offload 4 capas para máxima estabilidad</strong></p>
+      </div>
+    </section>
+
+    <section class="grid" id="lmstudio">
+      <div class="card">
+        <h2>📦 1) Instalé LM Studio</h2>
+        <p>Descargué desde <code>lmstudio.ai</code> → versión estable Windows</p>
+        <pre><code>Discover → Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
+→ DOWNLOAD → ~2.1GB → Listo</code></pre>
+      </div>
+    </section>
+
+    <section class="grid" id="servidor">
+      <div class="card success">
+        <h2>⚙️ 2) Servidor optimizado</h2>
+        <pre><code>Developer → Load Model → Context: 8192 tokens
+GPU Offload: 4 capas → Memory: 3.2GB VRAM ✓
+Settings → Enable CORS ✓ + Local Network ✓
+PORT: 1234 → 🟢 Server running ✓</code></pre>
+      </div>
+    </section>
+
+    <section class="grid" id="opencode">
+      <div class="card">
+        <h2>📱 3) OpenCode desde cero</h2>
+        <pre><code># PowerShell como Admin
+winget install OpenJS.NodeJS
+iex (New-Object Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')
+choco install opencode -y</code></pre>
+      </div>
+
+      <div class="card success">
+        <h2>🔥 4) Conexión exitosa</h2>
+        <pre><code>opencode
+:provider openai http://127.0.0.1:1234/v1 lm-studio
+✅ Connected to LM Studio ✓</code></pre>
+      </div>
+    </section>
+
+    <section class="grid" id="capturas">
+      <div class="card">
+        <h2>📸 Capturas de pantalla (zoom + abrir en pestaña)</h2>
+        <p>
+          Pasa el mouse para hacer zoom. Haz click para abrir en otra pestaña.
+          Coloca tus archivos como <code>captura1.png</code> y <code>captura2.png</code> junto a este HTML.
+        </p>
+
+        <div class="shots">
+          <!-- CAPTURA 1 -->
+          <a class="shotLink" href="2.png" target="_blank" rel="noopener">
+            <div class="shotMedia">
+              <span class="shotHint">🔎 Click: abrir</span>
+              <img src="2.png" alt="2">
+            </div>
+            <div class="shotCaption">✅ Captura 1: LM Studio con el servidor corriendo y configuración de contexto/offload.</div>
+          </a>
+
+          <!-- CAPTURA 2 -->
+          <a class="shotLink" href="1.png" target="_blank" rel="noopener">
+            <div class="shotMedia">
+              <span class="shotHint">🔎 Click: abrir</span>
+              <img src="1.png" alt="1">
+            </div>
+            <div class="shotCaption">✅ Captura 2: OpenCode conectado.</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="prueba">
+      <div class="card">
+        <h2>🧪 Prueba real</h2>
+        <p>Escribí: <code>"Función PHP validar email y password"</code><br><strong>Mi IA local generó código perfecto en 3 segundos</strong></p>
+      </div>
+    </section>
+
+    <footer>
+      <h3>Axel Cardozo · Febrero 2026</h3>
+      <p><em>Tarea completada con IA 100% local en mi GPU</em></p>
+    </footer>
+  </div>
+
+  <a class="top-btn" id="topBtn" href="#top" aria-label="Volver arriba">⬆</a>
+
+  <script>
+    // Menú mobile
+    const btn = document.getElementById('menuBtn');
+    const links = document.getElementById('navLinks');
+    btn.addEventListener('click', () => links.classList.toggle('open'));
+
+    // Botón volver arriba
+    const topBtn = document.getElementById('topBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) topBtn.classList.add('show');
+      else topBtn.classList.remove('show');
+    });
+
+    // Cerrar menú al hacer click en un link (móvil)
+    [...links.querySelectorAll('a')].forEach(a => {
+      a.addEventListener('click', () => links.classList.remove('open'));
+    });
+  </script>
+</body>
+</html>
