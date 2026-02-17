@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Asistente Formal - Práctica IA ASIR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* MENU FIJO */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+        }
+
+        nav a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 40px;
+        }
+
+        header {
+            text-align: center;
+            background: rgba(255,255,255,0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        section {
+            background: rgba(255,255,255,0.95);
+            margin: 2rem 0;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .paso {
+            display: flex;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 5px solid #48bb78;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .paso:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .paso-numero {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .screenshot-container {
+            position: relative;
+            display: block;
+            margin: 1rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .screenshot-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .screenshot-container img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+
+        .screenshot-caption {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .success-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.9);
+            margin-top: 3rem;
+        }
+
+        /* MODAL para imagen grande */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- MENU FIJO -->
+    <nav>
+        <ul>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#pasos">Paso a Paso</a></li>
+            <li><a href="#resultados">Resultados</a></li>
+            <li><a href="#capturas">Galería</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header id="inicio">
+            <h1>🎓 Fine-Tuning Asistente Formal</h1>
+            <p><strong>Práctica IA ASIR - Modelo Transformer desde cero</strong></p>
+            <div class="success-badge">✅ 100% EXITOSO - Loss -26.5%</div>
+            
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">2.709 → 1.994</div>
+                    <div>Loss Final</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">47</div>
+                    <div>Vocabulario</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">10</div>
+                    <div>Épocas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">~15K</div>
+                    <div>Parámetros</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PASO A PASO CON IMÁGENES -->
+        <section id="pasos">
+            <h2>📋 Paso a Paso - Proceso Completo</h2>
+            
+            <div class="paso">
+                <div class="paso-numero">1</div>
+                <div style="flex:1;">
+                    <h3>🔧 Preparación Entorno</h3>
+                    <p><span class="highlight">(venv) D:\mi-finetuning></span> python -m venv venv</p>
+                    <p><span class="highlight">pip install torch numpy transformers datasets</span></p>
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-numero">2</div>
+                <div style="flex:1;">
+                    <h3>📄 Dataset Personalizado</h3>
+                    <p>8 ejemplos español formal de alta calidad:</p>
+                    <ul style="margin:1rem 0;">
+                        <li><span class="highlight">"Hola, ¿quién eres?"</span> → "Buenas tardes. Soy su asistente..."</li>
+                        <li><span class="highlight">"¿Puedes darme una receta?"</span> → "Por supuesto, señor/a..."</li>
+                    </ul>
+                    <a href="1f.png" target="_blank" class="screenshot-container">
+                        <img src="1f.png" alt="Dataset JSONL" loading="lazy">
+                        <div class="screenshot-caption">Dataset 8 ejemplos formales</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-numero">3</div>
+                <div style="flex:1;">
+                    <h3>🔤 Tokenizador Character-Level</h3>
+                    <p><strong>Vocabulario único: 47 caracteres</strong> español formal (ñ, ¿, ¡ incluidos)</p>
+                    <a href="2f.png" target="_blank" class="screenshot-container">
+                        <img src="2f.png" alt="Vocabulario 47 chars" loading="lazy">
+                        <div class="screenshot-caption">✅ Vocabulario: 47 caracteres únicos</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-numero">4</div>
+                <div style="flex:1;">
+                    <h3>⚙️ Fine-Tuning Transformer</h3>
+                    <p>Arquitectura: <strong>3 capas MLP + conexiones residuales</strong></p>
+                    <a href="3f.png" target="_blank" class="screenshot-container">
+                        <img src="3f.png" alt="Entrenamiento Epoch 10" loading="lazy">
+                        <div class="screenshot-caption">Epoch 10/10: loss=1.994 ✓</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-numero">5</div>
+                <div style="flex:1;">
+                    <h3>💬 Chat Interactivo</h3>
+                    <p>Inferencia autoregresiva <strong>token-por-token</strong></p>
+                    <a href="4f.png" target="_blank" class="screenshot-container">
+                        <img src="4f.png" alt="Chat funcionando" loading="lazy">
+                        <div class="screenshot-caption">Chat interactivo funcionando ✓</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULTADOS -->
+        <section id="resultados">
+            <h2>📊 Resultados Técnicos</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+                <div>
+                    <h3>✅ CONCEPTOS DEMOSTRADOS</h3>
+                    <ul style="line-height: 2;">
+                        <li>Dataset curado <strong>alta calidad</strong></li>
+                        <li>Tokenizador <strong>character-level</strong></li>
+                        <li>Forward/Backward pass <strong>gradientes</strong></li>
+                        <li>Conexiones <strong>residuales</strong> ✓</li>
+                        <li>Guardado <strong>state_dict PyTorch</strong></li>
+                        <li>Inferencia <strong>autoregresiva</strong> ✓</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>📈 Métricas Entrenamiento</h3>
+                    <ul style="line-height: 2;">
+                        <li><strong>Loss:</strong> 2.709 → 1.994 <span class="success-badge">(-26.5%)</span></li>
+                        <li><strong>Vocabulario:</strong> 47 caracteres</li>
+                        <li><strong>Épocas:</strong> 10 completadas</li>
+                        <li><strong>Batch size:</strong> 4</li>
+                        <li><strong>Parámetros:</strong> ~15K</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- GALERÍA -->
+        <section id="capturas">
+            <h2>🖼️ Galería Completa</h2>
+            <div class="gallery">
+                <a href="1f.png" target="_blank" class="screenshot-container">
+                    <img src="1f.png" alt="Dataset JSONL" loading="lazy">
+                    <div class="screenshot-caption">Dataset 8 ejemplos formales</div>
+                </a>
+                <a href="2f.png" target="_blank" class="screenshot-container">
+                    <img src="2f.png" alt="Vocabulario 47 chars" loading="lazy">
+                    <div class="screenshot-caption">Tokenizador 47 caracteres</div>
+                </a>
+                <a href="3f.png" target="_blank" class="screenshot-container">
+                    <img src="3f.png" alt="Entrenamiento Epoch 10" loading="lazy">
+                    <div class="screenshot-caption">Fine-Tuning completado ✓</div>
+                </a>
+                <a href="4f.png" target="_blank" class="screenshot-container">
+                    <img src="4f.png" alt="Chat funcionando" loading="lazy">
+                    <div class="screenshot-caption">Inferencia en producción</div>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>🚀 <strong>Fine-Tuning Asistente Formal</strong> | Práctica IA ASIR | <span class="success-badge">100% Exitoso</span></p>
+    </footer>
+
+    <script>
+        // Smooth scroll para menú
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
