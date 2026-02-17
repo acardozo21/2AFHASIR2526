@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso IA: Crear tu Propio LLM - Guía Completa Paso a Paso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Barra de navegación fija */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            margin-top: 80px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Secciones */
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 2rem;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            transform: translateY(0);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .section h3 {
+            font-size: 1.5rem;
+            color: #555;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section h3::before {
+            content: '🎯';
+            font-size: 1.2rem;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            color: #f8f8f2;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background: linear-gradient(90deg, #667eea20, #764ba220);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* Emojis decorativos */
+        .emoji {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animación de entrada */
+        .section {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación fija -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🤖 LLM Creator</div>
+            <ul class="nav-links">
+                <li><a href="#fase1">Fase 1</a></li>
+                <li><a href="#fase2">Fase 2</a></li>
+                <li><a href="#fase3">Fase 3</a></li>
+                <li><a href="#fase4">Fase 4</a></li>
+                <li><a href="#fase5">Prueba Final</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Curso IA: Crea tu Propio LLM Local</h1>
+            <p>Transforma un modelo base en tu asistente especializado. Guía completa paso a paso con ejercicio práctico: "Chef-bot" - Tu LLM experto en cocina.</p>
+        </section>
+
+        <!-- Fase 1 -->
+        <section id="fase1" class="section">
+            <h2><span class="emoji">🎯</span>Fase 1: Preparación del Entorno</h2>
+            <p>Crear la base de trabajo para tu proyecto personalizado.</p>
+            
+            <h3>Crear Carpeta del Proyecto</h3>
+            <div class="code-block">
+                <pre>mkdir mi-chef-bot
+cd mi-chef-bot</pre>
+            </div>
+
+            <h3>Configurar Entorno Python</h3>
+            <div class="code-block">
+                <pre># Crear y activar entorno virtual
+python -m venv venv
+source venv/bin/activate  # (venv\Scripts\activate en Windows)
+
+# Instalar Axolotl
+pip install "axolotl[flash-attn,deepspeed] @ git+https://github.com/OpenAccess-AI-Collective/axolotl"
+
+# Clonar llama.cpp
+git clone https://github.com/ggerganov/llama.cpp.git
+pip install -r llama.cpp/requirements.txt</pre>
+            </div>
+        </section>
+
+        <!-- Fase 2 -->
+        <section id="fase2" class="section">
+            <h2><span class="emoji">📖</span>Fase 2: Creación del Dataset</h2>
+            <p>El corazón de la personalización: ejemplos de alta calidad.</p>
+            
+            <p>Crear <span class="highlight">recetas.jsonl</span> con ejemplos como:</p>
+            <div class="code-block">
+                <pre>{"instruction": "Tengo pechugas de pollo, limón y ajo.", 
+ "output": "¡Claro! Puedes preparar unas 'Pechugas de Pollo al Limón'. Sella las pechugas..."}</pre>
+            </div>
+        </section>
+
+        <!-- Fase 3 -->
+        <section id="fase3" class="section">
+            <h2><span class="emoji">🔥</span>Fase 3: Fine-Tuning</h2>
+            <p>Enseñando al modelo su especialidad con Axolotl.</p>
+            
+            <h3>Archivo config_chef.yml</h3>
+            <div class="code-block">
+                <pre>base_model: microsoft/Phi-3-mini-4k-instruct
+datasets:
+  - path: recetas.jsonl
+    type: alpaca
+lora_r: 16
+num_epochs: 4
+output_dir: ./chef-bot-lora</pre>
+            </div>
+
+            <h3>Ejecutar Entrenamiento</h3>
+            <div class="code-block">
+                <pre>accelerate launch -m axolotl.cli.train config_chef.yml</pre>
+            </div>
+        </section>
+
+        <!-- Fase 4 -->
+        <section id="fase4" class="section">
+            <h2><span class="emoji">📦</span>Fase 4: Cuantización</h2>
+            <p>Crear el archivo GGUF final ejecutable localmente.</p>
+            
+            <div class="code-block">
+                <pre># Fusionar LoRA
+accelerate launch -m axolotl.cli.merge_lora config_chef.yml
+
+# Cuantizar a GGUF
+python llama.cpp/convert-hf-to-gguf.py ./chef-bot-lora/merged/ --outfile chef-bot-q4.gguf --outtype q4_k_m</pre>
+            </div>
+        </section>
+
+        <!-- Fase 5 -->
+        <section id="fase5" class="section">
+            <h2><span class="emoji">🍽️</span>Fase 5: Prueba Final</h2>
+            <p>¡Tu LLM personalizado está listo! Carga en LM Studio.</p>
+            
+            <p><strong>Prueba:</strong> "Tengo aguacates, cebolla morada, tomate y lima."</p>
+            <p><em>Resultado esperado:</em> "¡Excelente! Con esos ingredientes puedes preparar un 'Guacamole' clásico..."</p>
+        </section>
+    </div>
+
+    <script>
+        // Efecto scroll para navbar
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 6px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Smooth scroll para enlaces de navegación
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>
